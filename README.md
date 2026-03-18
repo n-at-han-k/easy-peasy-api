@@ -143,32 +143,36 @@ curl localhost:3000/api/v1/customers/uncontacted/55/notes/12    # params[:uncont
 
 ### Renaming params with `set_params`
 
-By default, dynamic segments are named after the parent directory (`customers` -> `customer_id`). If you want different names, inherit from `EasyPeasyApi::ApplicationController` and call `set_params` in your action:
+Dynamic segments are auto-named after the parent directory (singularized + `_id`). Sometimes that default name doesn't match your domain. Inherit from `EasyPeasyApi::ApplicationController` and call `set_params` in the action to rename them:
 
 ```ruby
-# app/controllers/api/v1/customers/uncontacted/notes_controller.rb
-module Api::V1::Customers::Uncontacted
+# app/controllers/api/v1/customers/notes_controller.rb
+#
+# URL: /api/v1/customers/42/notes/99
+# Default params: customer_id=42, id=99
+# After set_params: account_id=42, id=99
+module Api::V1::Customers
   class NotesController < EasyPeasyApi::ApplicationController
     def index
-      set_params :customer_id
-      render json: Note.where(customer_id: params[:customer_id])
+      set_params :account_id
+      render json: Note.where(account_id: params[:account_id])
     end
 
     def show
-      set_params :customer_id, :id
-      render json: Note.find(params[:id])
+      set_params :account_id, :id
+      render json: Note.find_by(account_id: params[:account_id], id: params[:id])
     end
   end
 end
 ```
 
 ```
-curl localhost:3000/api/v1/customers/uncontacted/55/notes/12
-# Without set_params: params[:uncontacted_id] = "55"
-# With set_params:    params[:customer_id] = "55"
+curl localhost:3000/api/v1/customers/42/notes
+# Without set_params: params[:customer_id] = "42"
+# With set_params:    params[:account_id] = "42"
 ```
 
-`set_params` takes the param names in order of appearance in the URL. Call it in the action method, or in a `before_action` -- it rebuilds the params each time so you can call it as many times as you need.
+`set_params` maps names to dynamic segment values in the order they appear in the URL. Call it in the action, or in a `before_action`. It rebuilds params each time, so you can call it as many times as you need.
 
 ## Param naming rules
 
