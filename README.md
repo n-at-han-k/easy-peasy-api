@@ -1,5 +1,7 @@
 # easy-peasy-api
 
+[![Ask DeepWiki](https://deepwiki.com/badge.svg)](https://deepwiki.com/n-at-han-k/easy-peasy-api)
+
 Filesystem-based API routing for Rails. Drop controller files into a directory and they become API endpoints automatically. No `routes.rb` entries needed.
 
 ## Install
